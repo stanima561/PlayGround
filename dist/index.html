@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE HOLLOW CROWN — A Soulslike Dark Fantasy</title>
+    <meta name="description" content="An ordinary human. A corrupted fairytale kingdom. A crown made of hollow things." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23c9a45c' d='M8 46 14 18l12 12L32 8l6 22 12-12 6 28z'/%3E%3Ccircle cx='32' cy='52' r='4' fill='%238e2f2f'/%3E%3C/svg%3E" />
+    <script type="module" crossorigin src="./assets/index-BQIVMfd0.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-S1SaWqBH.css">
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- =====================  HUD  ===================== -->
+      <div id="hud" class="hidden">
+        <div class="hud-top-left">
+          <div class="vitals">
+            <div class="bar-row hp-row">
+              <div class="bar-ornament"></div>
+              <div class="bar-shell"><div id="hp-fill" class="bar-fill hp"></div><div id="hp-lag" class="bar-lag"></div></div>
+            </div>
+            <div class="bar-row st-row">
+              <div class="bar-ornament small"></div>
+              <div class="bar-shell"><div id="st-fill" class="bar-fill stamina"></div></div>
+            </div>
+            <div class="bar-row fp-row">
+              <div class="bar-ornament small"></div>
+              <div class="bar-shell"><div id="fp-fill" class="bar-fill focus"></div></div>
+            </div>
+            <div class="status-icons">
+              <div id="flask-icon" class="status-pill"><span class="flask-glyph">⚗</span><span id="flask-count">3</span></div>
+              <div id="buff-icons"></div>
+            </div>
+          </div>
+          <div id="objective" class="objective">
+            <div class="objective-kicker">THREAD OF FATE</div>
+            <div id="objective-text">Wake beneath the hollow tree.</div>
+          </div>
+        </div>
+
+        <div class="hud-top-right">
+          <div class="motes-display"><span class="mote-glyph">✦</span><span id="motes-count">0</span></div>
+          <div class="equip-display">
+            <div class="equip-slot"><span class="slot-label">ARM</span><span id="armor-name">Hoodie</span></div>
+            <div class="equip-slot"><span class="slot-label">WPN</span><span id="weapon-name">Metal Pipe</span></div>
+          </div>
+          <div class="region-tag"><span id="region-name">THE FORGOTTEN SHIRE</span><span id="region-sub">Eldoria</span></div>
+        </div>
+
+        <div id="lock-reticle" class="lock-reticle hidden"><div class="reticle-dot"></div><div class="reticle-ring"></div></div>
+        <div id="enemy-bars"></div>
+
+        <div id="interact-prompt" class="interact-prompt hidden"><span id="interact-key" class="key">E</span><span id="interact-text">Interact</span></div>
+        <div id="boss-bar" class="boss-bar hidden">
+          <div class="boss-title"><span id="boss-name">THE HOLLOW WOODSMAN</span><span id="boss-sub">Keeper of the First Grove</span></div>
+          <div class="boss-bar-shell"><div id="boss-fill" class="boss-bar-fill"></div><div id="boss-lag" class="boss-bar-lag"></div></div>
+          <div id="boss-phase" class="boss-phase">I</div>
+        </div>
+
+        <div id="subtitle" class="subtitle hidden"></div>
+        <div id="toasts" class="toasts"></div>
+        <div id="damage-flash" class="damage-flash"></div>
+        <div id="hint" class="hint hidden"></div>
+        <div id="contextual" class="contextual hidden"></div>
+      </div>
+
+      <!-- =====================  CINEMATIC  ===================== -->
+      <div id="cinematic" class="cinematic hidden">
+        <div class="letterbox top"></div>
+        <div class="letterbox bottom"></div>
+        <div id="cinematic-title" class="cinematic-title hidden">
+          <h1>THE HOLLOW CROWN</h1>
+          <p>Chapter I · The Forgotten Shire</p>
+        </div>
+        <div id="cinematic-lines" class="cinematic-lines"></div>
+        <div class="skip-hint">[ESC] SKIP</div>
+      </div>
+
+      <!-- =====================  TITLE  ===================== -->
+      <div id="title-screen" class="screen title-screen">
+        <div class="title-vignette"></div>
+        <div class="title-content">
+          <div class="title-eyebrow">A SOULSLIKE DARK FAIRYTALE</div>
+          <h1 class="game-title"><span class="t-small">THE</span><span class="t-main">HOLLOW</span><span class="t-main gold">CROWN</span></h1>
+          <div class="title-rule"><i></i><span>✦</span><i></i></div>
+          <p class="title-tagline">An ordinary human. A kingdom devoured from within.<br/>The only way home is through the dark.</p>
+          <div class="title-menu">
+            <button id="btn-new" class="menu-btn primary">BEGIN JOURNEY</button>
+            <button id="btn-continue" class="menu-btn hidden">CONTINUE FROM SHRINE</button>
+            <button id="btn-controls" class="menu-btn">CONTROLS</button>
+            <button id="btn-credits" class="menu-btn">CREDITS</button>
+          </div>
+          <div id="title-saveinfo" class="title-saveinfo"></div>
+        </div>
+        <div class="title-footer">A playable vertical slice · Chapter I of VI</div>
+        <div class="title-version">v1.0 · built for keyboard &amp; controller</div>
+      </div>
+
+      <!-- =====================  LOADING  ===================== -->
+      <div id="loading" class="screen loading-screen">
+        <div class="load-sigil">✦</div>
+        <div class="load-title">THE HOLLOW CROWN</div>
+        <div class="load-bar"><div id="load-fill"></div></div>
+        <div id="load-status" class="load-status">Gathering the embers…</div>
+      </div>
+
+      <!-- =====================  MENUS  ===================== -->
+      <div id="menu-overlay" class="screen overlay hidden">
+        <div class="menu-frame">
+          <div class="menu-head">
+            <h2 id="menu-title">PAUSED</h2>
+            <div class="menu-head-rule"></div>
+            <button id="menu-close" class="close-btn" aria-label="Close">✕</button>
+          </div>
+          <div id="menu-body" class="menu-body"></div>
+          <div id="menu-footer" class="menu-footer"></div>
+        </div>
+      </div>
+
+      <div id="dialogue" class="dialogue hidden">
+        <div class="dialogue-portrait" id="dialogue-portrait"></div>
+        <div class="dialogue-content">
+          <div class="dialogue-name" id="dialogue-name">Marrow</div>
+          <div class="dialogue-text" id="dialogue-text"></div>
+          <div class="dialogue-options" id="dialogue-options"></div>
+          <div class="dialogue-hint" id="dialogue-hint">[E] continue</div>
+        </div>
+      </div>
+
+      <div id="death-screen" class="screen death-screen hidden">
+        <div class="death-band"></div>
+        <h1 class="you-died">YOU DIED</h1>
+        <p id="death-line">The shire remembers your name. It will not remember your face.</p>
+        <button id="btn-respawn" class="menu-btn primary">RISE AT THE LAST SHRINE</button>
+        <div class="death-motes" id="death-motes"></div>
+      </div>
+
+      <div id="victory-banner" class="victory-banner hidden">
+        <div class="victory-rule"></div>
+        <h1 id="victory-title">GREAT ENEMY FELLED</h1>
+        <p id="victory-sub">The Hollow Woodsman has fallen.</p>
+        <div class="victory-rule"></div>
+      </div>
+
+      <div id="ending-screen" class="screen ending-screen hidden">
+        <div class="ending-bg"></div>
+        <div class="ending-content">
+          <div class="ending-kicker" id="ending-kicker">ENDING A</div>
+          <h1 id="ending-title">A NEW DAWN</h1>
+          <div class="ending-rule"></div>
+          <p id="ending-text"></p>
+          <div id="ending-flavor" class="ending-flavor"></div>
+          <button id="btn-ending-continue" class="menu-btn primary">RETURN TO THE THRESHOLD</button>
+        </div>
+      </div>
+
+      <div id="controls-screen" class="screen overlay hidden">
+        <div class="menu-frame wide">
+          <div class="menu-head">
+            <h2>CONTROLS</h2>
+            <div class="menu-head-rule"></div>
+            <button id="controls-close" class="close-btn">✕</button>
+          </div>
+          <div class="controls-grid" id="controls-grid"></div>
+          <div class="menu-footer">Keyboard &amp; mouse · Xbox-style controller supported</div>
+        </div>
+      </div>
+
+      <div id="fade" class="fade"></div>
+      <div id="lowhp" class="lowhp"></div>
+      <div id="gamepad-hint" class="gamepad-hint hidden">CONTROLLER CONNECTED</div>
+    </div>
+  </body>
+</html>
