@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#071116" />
+  <title>CHRONOFRONT: Alien Invasion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js"}}
+  </script>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark"><span></span><i></i></div><div><div class="brand-name">CHRONO<span>FRONT</span></div><div class="brand-sub">TEMPORAL DEFENSE INITIATIVE <b>·</b> SECTOR 07</div></div></div>
+      <div class="top-center"><span class="live-dot"></span><span id="statusText">PERIMETER STABLE</span><span class="top-divider"></span><span class="sector-label" id="timelineTag">TIMELINE 01 / 05</span></div>
+      <div class="top-actions"><button class="icon-btn" id="soundBtn" title="Toggle sound">♫</button><button class="icon-btn" id="pauseBtn" title="Pause">Ⅱ</button><div class="commander"><div class="commander-icon">⌬</div><div><b>COMMANDER</b><small>LVL 04 · FIELD OPS</small></div></div></div>
+    </header>
+    <main class="layout">
+      <aside class="left-panel">
+        <section class="mission-card"><div class="eyebrow"><span class="live-dot"></span> ACTIVE OPERATION</div><h1>THE LAST<br><em>ANCHOR</em></h1><p>Hold the line. Protect the Chrono Reactor at all costs.</p><div class="mission-meta"><span>◈ <b>CAMPAIGN</b></span><span>◷ <b id="timeLabel">00:00</b></span></div></section>
+        <section class="timeline-section"><div class="section-heading">TEMPORAL FRONTIER <span>01 — 05</span></div><div class="timeline-list" id="timelineList"></div></section>
+        <section class="reactor-card"><div class="reactor-head"><div><div class="section-heading">CHRONO REACTOR</div><small>CORE INTEGRITY</small></div><div class="reactor-status" id="reactorStatus">ONLINE</div></div><div class="integrity-line"><strong id="hpText">100</strong><span>%</span><div class="integrity-track"><i id="hpBar"></i></div></div><div class="reactor-foot"><span>SHIELD GENERATOR</span><b>ACTIVE</b></div></section>
+        <section class="intel-card"><div class="intel-icon">⌁</div><div><div class="section-heading">FIELD INTEL</div><p id="intelText">Alien signatures detected. Establish your perimeter before the next breach.</p></div></section>
+        <button class="tech-button" id="techButton"><span class="tech-symbol">⌘</span><span><b>RESEARCH & DEVELOPMENT</b><small>PERMANENT TECHNOLOGY UPGRADES</small></span><span class="arrow">↗</span></button>
+      </aside>
+      <section class="battlefield" id="battlefield">
+        <canvas id="gameCanvas"></canvas>
+        <div class="scene-vignette"></div><div class="scanlines"></div>
+        <div class="battle-hud">
+          <div class="wave-card"><div class="wave-overline"><span class="wave-pulse"></span> INCOMING THREAT</div><div class="wave-number"><small>WAVE</small><strong id="waveText">01</strong><span id="waveTotal">/ 100</span></div><div class="wave-progress"><span id="waveProgress"></span></div><div class="wave-caption" id="waveCaption">NEXT BREACH IN <b>00:18</b></div></div>
+          <div class="resource-row">
+            <div class="resource-pill bio"><span class="resource-gem">✦</span><div><small>BIO-ENERGY</small><b id="bioText">240</b></div><span class="resource-plus">+</span></div>
+            <div class="resource-pill tech"><span class="resource-gem">⬡</span><div><small>ALIEN TECH</small><b id="techText">90</b></div><span class="resource-plus">+</span></div>
+            <div class="resource-pill chrono"><span class="resource-gem">◈</span><div><small>CHRONO CRYSTAL</small><b id="crystalText">12</b></div><span class="resource-plus">+</span></div>
+          </div>
+          <div class="threat-indicator"><span>THREAT LEVEL</span><div class="threat-bars" id="threatBars"></div><b id="threatText">LOW</b></div>
+        </div>
+        <div class="zone-label"><span class="zone-line"></span><div><small>ACTIVE BATTLE ZONE</small><b id="zoneName">PRIMORDIAL WILDS</b></div><span class="zone-coords">X: 048 · Y: 211</span></div>
+        <div class="map-controls"><button id="zoomOut" aria-label="Zoom out">−</button><span>TACTICAL VIEW</span><button id="zoomIn" aria-label="Zoom in">+</button></div>
+        <div class="selected-card hidden" id="selectedCard"><button class="close-selected" id="closeSelected">×</button><div class="selected-icon" id="selectedIcon">⌖</div><div class="selected-info"><small>DEFENSE UNIT</small><b id="selectedName">Sentinel</b><span id="selectedStats">DMG 14 · RANGE 4.5</span></div><button class="upgrade-btn" id="upgradeBtn">UPGRADE <b id="upgradeCost">80</b></button></div>
+        <div class="toast" id="toast"></div>
+        <div class="build-hint" id="buildHint"><span>＋</span> SELECT A UNIT TO DEPLOY</div>
+      </section>
+      <aside class="right-panel">
+        <div class="panel-title"><div><span class="section-heading">DEFENSE NETWORK</span><small>DEPLOY UNITS · BUILD YOUR LINE</small></div><button class="panel-menu">···</button></div>
+        <div class="unit-counts"><div><b id="unitCount">00</b><span>DEPLOYED</span></div><div class="count-separator"></div><div><b id="killCount">00</b><span>ELIMINATED</span></div><div class="count-separator"></div><div><b>∞</b><span>THREAT</span></div></div>
+        <div class="unit-list" id="unitList"></div>
+        <div class="deployment-note"><span>i</span><p><b>DEPLOYMENT TIP</b> Place units on open ground within the defensive grid. Select a unit, then tap a highlighted position.</p></div>
+        <div class="separator"></div>
+        <div class="automations"><div class="section-heading">AUTOMATED DEFENSES <span class="online-tag">ONLINE</span></div><div class="auto-row"><span class="auto-icon turret-auto">⌖</span><div><b>Perimeter Turrets</b><small>2 / 4 ACTIVE</small></div><span class="auto-state"></span></div><div class="auto-row"><span class="auto-icon shield-auto">◉</span><div><b>Reactor Shield</b><small>ABSORBING IMPACT</small></div><span class="auto-state"></span></div></div>
+        <button class="extractor-button" id="extractorBtn"><span class="extractor-icon">⛏</span><span><b>BUILD RESOURCE EXTRACTOR</b><small>GENERATE BIO-ENERGY OVER TIME</small></span><strong>120 <i>✦</i></strong></button>
+      </aside>
+    </main>
+    <footer class="bottom-bar"><div class="bottom-left"><span class="connection"><i></i> LINK SECURE</span><span class="bottom-divider"></span><span>BUILD MODE <b id="buildModeText">OFF</b></span><span class="bottom-divider"></span><span>FPS <b id="fpsText">60</b></span></div><div class="deploy-center"><button class="deploy-btn" id="deployBtn"><span class="deploy-icon">▶</span><span><b id="deployLabel">DEPLOY NEXT WAVE</b><small id="deploySub">PREPARE FOR CONTACT</small></span><span class="deploy-key">SPACE</span></button></div><div class="bottom-right"><button class="speed-btn active" data-speed="1">1×</button><button class="speed-btn" data-speed="2">2×</button><button class="speed-btn" data-speed="3">3×</button><span class="bottom-divider"></span><span class="build-count">UNITS <b id="bottomUnitCount">0</b> / 12</span></div></footer>
+    <div class="modal-backdrop hidden" id="modalBackdrop"><div class="modal" id="modalContent"></div></div>
+  </div>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
