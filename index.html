@@ -540,6 +540,40 @@ function mkLabel(t1,t2,col,big){const c=mkCanvas(256,64),x=c.getContext('2d');
   x.fillStyle='rgba(6,6,6,.78)';x.strokeStyle=col;x.lineWidth=3;x.strokeRect(2,2,252,60);x.fillRect(2,2,252,60);
   x.fillStyle=col;x.font='bold '+(big?30:24)+'px Arial';x.textAlign='center';x.fillText(t1,128,t2?26:40);
   if(t2){x.fillStyle='#ddddd6';x.font='bold 16px Arial';x.fillText(t2,128,52);}return c;}
+function makeWallBuy(b){
+  const c=mkCanvas(256,256),x=c.getContext('2d'),w=WEAPONS[b.w],col=w.c;
+  const bg=x.createLinearGradient(0,0,256,256);bg.addColorStop(0,'#343a3b');bg.addColorStop(.5,'#171b1c');bg.addColorStop(1,'#090b0c');
+  x.fillStyle='rgba(0,0,0,.5)';x.fillRect(10,12,240,236);
+  x.fillStyle=bg;x.fillRect(12,8,232,236);x.strokeStyle='#a27635';x.lineWidth=3;x.strokeRect(13,9,230,234);
+  x.fillStyle='#bd9145';x.fillRect(20,17,216,3);x.fillStyle='#080a0b';x.fillRect(20,24,216,54);
+  x.textAlign='center';x.fillStyle='#f0c46b';x.font='bold 23px Arial';x.fillText(w.n.toUpperCase(),128,49,208);
+  x.fillStyle='#f5eee0';x.font='bold 17px Arial';x.fillText(b.px+' POINTS',128,70);
+  x.fillStyle='rgba(255,176,58,.12)';x.fillRect(21,83,214,143);
+  // Wall-mounted weapon silhouette, drawn broadside with a category-specific profile.
+  const pistol=col==='pistol'||col==='revolver',shot=col==='pump',sniper=col==='bolt',heavy=col==='lmg',ray=col==='ray'||col==='gl';
+  const scale=pistol?.72:shot?.94:sniper?1.12:1,baseY=155,center=128;
+  x.save();x.translate(center,baseY);x.scale(scale,scale);
+  const body=ray?'#334b4c':'#24292c',metal=ray?'#66d8d8':'#737a7c',wood=['ak','rpk','r870'].includes(b.w)?'#765333':'#30363a';
+  x.fillStyle='rgba(0,0,0,.65)';x.fillRect(-94,-4,190,20);
+  // stock, receiver and barrel
+  if(!pistol){x.fillStyle=wood;x.fillRect(-91,-11,48,18);x.fillStyle='#171a1c';x.fillRect(-86,-8,35,3);}
+  x.fillStyle='#111416';x.fillRect(-46,-7,119,8);x.fillStyle=metal;x.fillRect(-32,-12,74,20);
+  x.fillStyle=body;x.fillRect(-27,-9,62,14);x.fillStyle='#111416';x.fillRect(27,-5,73,4);
+  x.fillStyle=metal;x.fillRect(62,-6,37,2);x.fillStyle='#080a0b';x.fillRect(97,-8,7,10);x.fillStyle='#c2b17c';x.fillRect(101,-5,2,4);
+  // grip and magazine; shotgun and launchers get larger lower profiles.
+  x.fillStyle=wood;x.beginPath();x.moveTo(-2,6);x.lineTo(15,6);x.lineTo(10,29);x.lineTo(-5,27);x.closePath();x.fill();
+  if(!pistol){x.fillStyle=body;x.fillRect(15,5,14,24);x.strokeStyle='#080a0b';x.strokeRect(15,5,14,24);}
+  if(shot||heavy||ray){x.fillStyle=ray?'#d3a93f':'#474b43';x.fillRect(-35,8,48,8);x.fillStyle=metal;x.fillRect(-35,8,48,2);}
+  if(sniper){x.fillStyle='#101315';x.fillRect(-5,-19,42,6);x.fillStyle=metal;x.fillRect(1,-17,30,2);}
+  if(heavy){x.fillStyle='#45483d';x.beginPath();x.ellipse(-10,22,18,12,0,0,Math.PI*2);x.fill();x.strokeStyle='#111';x.stroke();}
+  if(col==='revolver'){x.fillStyle='#555a5a';x.beginPath();x.arc(-3,0,11,0,Math.PI*2);x.fill();x.strokeStyle='#111';x.stroke();for(let i=0;i<6;i++){x.fillStyle='#151819';x.beginPath();x.arc(-3+Math.cos(i*Math.PI/3)*6,Math.sin(i*Math.PI/3)*6,2,0,Math.PI*2);x.fill();}}
+  if(ray){x.shadowColor='#5cf4ff';x.shadowBlur=12;x.fillStyle='#52f1f5';x.fillRect(-24,-8,27,5);x.shadowBlur=0;}
+  x.fillStyle='#151819';x.fillRect(-33,-17,42,4);x.fillStyle=metal;x.fillRect(-28,-17,3,3);x.fillRect(3,-17,3,3);
+  x.restore();
+  x.fillStyle='#747a78';x.fillRect(23,222,210,2);x.fillStyle='#c4a25e';x.font='bold 11px Arial';x.textAlign='left';x.fillText('WALL BUY  ·  AMMO '+b.ax,26,238);
+  for(const [bx,by] of [[22,19],[234,19],[22,231],[234,231]]){x.fillStyle='#9b7940';x.beginPath();x.arc(bx,by,3,0,Math.PI*2);x.fill();x.fillStyle='#29241b';x.fillRect(bx-1,by,2,1);}
+  return c;
+}
 function mkProp(kind){const c=mkCanvas(30,30),x=c.getContext('2d');
   if(kind==='barrel'){x.fillStyle='#5c3a18';x.fillRect(6,4,18,24);x.fillStyle='#7a4e20';x.fillRect(6,8,18,3);x.fillRect(6,19,18,3);x.fillStyle='#3a2410';x.fillRect(6,12,18,2);x.fillStyle='#111';x.fillRect(6,25,18,2);}
   else{x.fillStyle='#4a3a26';x.fillRect(4,8,22,18);x.strokeStyle='#2b2016';x.lineWidth=2;x.strokeRect(5,9,20,16);x.fillStyle='#3a2c1c';x.fillRect(4,10,22,3);}
@@ -1284,7 +1318,7 @@ function loadMap(mi){
   M.radio={x:M.radio[0],y:M.radio[1]};
   M.eggDone=false;
   labelCR={};
-  for(const b of M.buys)labelCR[b.w]=mkLabel(WEAPONS[b.w].n.toUpperCase(),b.px+' PTS · AMMO '+b.ax,'#ffb03a',true);
+  for(const b of M.buys)labelCR[b.w]=makeWallBuy(b);
   doorLabel=mkLabel('LOCKED DOOR','HOLD '+keyUse()+' TO BUY','#e05555',true);
   M.hostile=0;
   // art caches rebuilt (label text depends on keyUse)
@@ -1379,7 +1413,7 @@ function drawEntity(s){
     else if(!boxRoll.on)push2Label('MYSTERY BOX','✥950','#d8b04a',s,0.75,{a:0.9});}
   else if(s.kind==='forge')drawSpriteHL(forgeImg,s,{w:0.62,h:0.58,zOff:0,a:1,glow:'#e8742a'});
   else if(s.kind==='perk')drawSpriteHL(machineImg(PERKS[s.o.id].c,PERKS[s.o.id].n.split(' ')[0]),s,{w:0.6,h:0.92,zOff:0,a:1,glow:PERKS[s.o.id].c});
-  else if(s.kind==='buy')drawSpriteHL(labelCR[s.o.w],s,{w:0.78,h:0.42,zOff:0.32,a:1,glow:'#ffb03a'});
+  else if(s.kind==='buy')drawSpriteHL(labelCR[s.o.w],s,{w:0.9,h:0.72,zOff:0.42,a:1,glow:'#ffb03a'});
   else if(s.kind==='doorL'){if(!s.o.open)drawSpriteHL(doorLabel,s,{w:0.9,h:0.34,zOff:0.62,a:0.95});}
   else if(s.kind==='window'){const img=windowCache[s.o.boards]!=null?windowCache[s.o.boards]:windowCache[0];drawSpriteHL(img,s,{w:0.86,h:1.1,zOff:0.04,a:1});}
   else if(s.kind==='egg'){drawS(gargoyleImg,s,{w:0.28,h:0.34,zOff:1.1+Math.sin(tNow*2)*0.05,a:0.95,glow:'#8cf'});}
