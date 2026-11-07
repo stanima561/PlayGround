@@ -9,7 +9,7 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:#000;font-family:"Segoe UI",Roboto,Arial,sans-serif;color:#ddd;user-select:none}
 #wrap{position:fixed;inset:0}
-canvas#game{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;background:#000;touch-action:none}
+canvas#game{position:absolute;inset:0;width:100%;height:100%;image-rendering:auto;background:#000;touch-action:none}
 #hud{position:absolute;inset:0;pointer-events:none;padding:max(10px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
 .panel{background:linear-gradient(180deg,rgba(8,10,8,.62),rgba(0,0,0,.82));border:1px solid #2e342e;border-radius:4px;padding:7px 11px}
 #topL{position:absolute;top:max(10px,env(safe-area-inset-top));left:max(14px,env(safe-area-inset-left))}
@@ -156,7 +156,7 @@ const clamp=(v,a,b)=>v<a?a:v>b?b:v, rnd=(a,b)=>a+Math.random()*(b-a), ri=(a,b)=>
 const TAU=Math.PI*2, angN=a=>{while(a>Math.PI)a-=TAU;while(a<-Math.PI)a+=TAU;return a;};
 const SAVE=(k,v)=>{try{localStorage.setItem('czrw_'+k,JSON.stringify(v));}catch(e){}};
 const LOAD=(k,d)=>{try{const v=localStorage.getItem('czrw_'+k);return v==null?d:JSON.parse(v);}catch(e){return d;}};
-const settings={preset:LOAD('preset','default'),sens:LOAD('sens',1),invert:LOAD('invert',false),quality:LOAD('quality','high'),fov:LOAD('fov',80),mapId:LOAD('mapId',0)};
+const settings={preset:LOAD('preset','default'),sens:LOAD('sens',1),invert:LOAD('invert',false),quality:String(LOAD('quality','high')).toLowerCase(),fov:LOAD('fov',80),mapId:LOAD('mapId',0)};
 
 /* ---------------- AUDIO ---------------- */
 let AC=null,muted=false,musGain=null,musLvl=0;
@@ -274,9 +274,9 @@ function readInput(dt){
 /* ---------------- CANVAS ---------------- */
 const cvC=document.createElement?0:0;
 const gameCanvas=$('game');let ctx=gameCanvas.getContext('2d');
-const QUAL={low:0.7,medium:0.88,high:1,ultra:1.25};
-let RW=480,RH=270,zbuf=new Float32Array(0);
-function setQuality(){const q=QUAL[settings.quality]||1;RW=Math.round(480*q);RH=Math.round(270*q);gameCanvas.width=RW;gameCanvas.height=RH;ctx=(0,gameCanvas.getContext('2d'));ctx.imageSmoothingEnabled=false;zbuf=new Float32Array(RW);}
+const QUAL={low:0.75,medium:1,high:1.5,ultra:2};
+let RW=640,RH=360,zbuf=new Float32Array(0);
+function setQuality(){const q=QUAL[String(settings.quality).toLowerCase()]||QUAL.high;RW=Math.round(640*q);RH=Math.round(360*q);gameCanvas.width=RW;gameCanvas.height=RH;ctx=(0,gameCanvas.getContext('2d'));ctx.imageSmoothingEnabled=false;zbuf=new Float32Array(RW);}
 setQuality();
 let toastTxt=null;
 function toast(m,t){const e=$('toast');e.innerHTML=m;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',t||2600);}
@@ -807,8 +807,8 @@ function updatePlayer(dt){
   if(player.ads>0.5)sp*=0.66;
   if(l>1){mvx/=l;mvy/=l;}
   const fx=Math.cos(player.a),fy=Math.sin(player.a);
-  const dx=(fx*(-mvy))*sp*dt+(fy*mvx)*sp*dt;
-  const dy=(fy*(-mvy))*sp*dt-(fx*mvx)*sp*dt;
+  const dx=(fx*(-mvy)-fy*mvx)*sp*dt;
+  const dy=(fy*(-mvy)+fx*mvx)*sp*dt;
   moveC(player.slideT>0?dx*1.85:dx,player.slideT>0?dy*1.85:dy);
   player.bob+=l*sp*dt*1.75;
   player.a=angN(player.a+IN.look);
@@ -1533,7 +1533,7 @@ function refreshUI(){
     settings.preset=id;preset=PRESETS[id];SAVE('preset',id);refreshUI();});
   buildBtns('padBtns2',Object.values(PRESETS).map(pp=>pp.name),settings.preset,id=>{
     settings.preset=id;preset=PRESETS[id];SAVE('preset',id);refreshUI();});
-  buildBtns('qBtns',['LOW','MEDIUM','HIGH','ULTRA'],settings.quality,id=>{settings.quality=id;SAVE('quality',id);setQuality();refreshUI();});
+  buildBtns('qBtns',['LOW','MEDIUM','HIGH','ULTRA'],settings.quality.toUpperCase(),id=>{settings.quality=id.toLowerCase();SAVE('quality',settings.quality);setQuality();refreshUI();});
   buildTable('ctrlT');
   $('fovB').textContent='FOV: '+settings.fov+'°';
 }
