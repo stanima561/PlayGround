@@ -206,7 +206,7 @@ body.touch #bossBarW{width:min(280px,58vw)}
    Self-contained raycasting FPS engine. Xbox Gamepad API with
    CoD Zombies presets, rumble, hold-X buy. Touch + KB/Mouse.
    WebAudio synth SFX/music. LocalStorage profile. 4 maps, 7
-   zombie types, 22 weapons, perks, WAR FORGE, bosses, eggs. */
+   zombie types, 22 weapons, perks, Pack-a-Punch, bosses, eggs. */
 const $=(i)=>document.getElementById(i);
 const clamp=(v,a,b)=>v<a?a:v>b?b:v, rnd=(a,b)=>a+Math.random()*(b-a), ri=(a,b)=>Math.floor(rnd(a,b+1));
 const TAU=Math.PI*2, angN=a=>{while(a>Math.PI)a-=TAU;while(a<-Math.PI)a+=TAU;return a;};
@@ -578,14 +578,37 @@ function mkProp(kind){const c=mkCanvas(30,30),x=c.getContext('2d');
   if(kind==='barrel'){x.fillStyle='#5c3a18';x.fillRect(6,4,18,24);x.fillStyle='#7a4e20';x.fillRect(6,8,18,3);x.fillRect(6,19,18,3);x.fillStyle='#3a2410';x.fillRect(6,12,18,2);x.fillStyle='#111';x.fillRect(6,25,18,2);}
   else{x.fillStyle='#4a3a26';x.fillRect(4,8,22,18);x.strokeStyle='#2b2016';x.lineWidth=2;x.strokeRect(5,9,20,16);x.fillStyle='#3a2c1c';x.fillRect(4,10,22,3);}
   return c;}
-function mkMachine(col,t1){const c=mkCanvas(28,44),x=c.getContext('2d');
-  x.fillStyle='#14161a';x.fillRect(2,2,24,40);x.fillStyle=col;x.fillRect(4,4,20,10);x.fillStyle='#0c0d10';x.fillRect(4,16,20,14);
-  x.fillStyle=col;x.globalAlpha=0.55;x.fillRect(6,18,16,10);x.globalAlpha=1;x.fillStyle='#111';x.fillRect(10,32,8,6);
-  x.fillStyle='#fff';x.font='bold 7px Arial';x.textAlign='center';x.fillText(t1,14,12);return c;}
-function mkForge(){const c=mkCanvas(36,34),x=c.getContext('2d');
-  x.fillStyle='#26282c';x.fillRect(2,8,32,24);x.fillStyle='#3a3d42';x.fillRect(2,8,32,6);
-  x.fillStyle='#e8742a';x.fillRect(6,18,24,10);x.fillStyle='#ffd15c';x.fillRect(9,20,18,4);
-  x.fillStyle='#111';x.fillRect(2,30,32,2);x.fillStyle='#c94';x.font='bold 9px Arial';x.textAlign='center';x.fillText('Forge',18,6);return c;}
+function mkMachine(col,t1){const c=mkCanvas(56,76),x=c.getContext('2d');
+  // Heavy, art-deco vending cabinet with a lit marquee, glass bottle bay and service hatch.
+  x.fillStyle='rgba(0,0,0,.45)';x.fillRect(5,7,48,67);
+  x.fillStyle='#101316';x.fillRect(4,5,48,68);x.fillStyle='#303338';x.fillRect(7,8,42,61);
+  x.fillStyle='#0b0c0e';x.fillRect(9,10,38,15);x.fillStyle=col;x.fillRect(10,11,36,12);
+  const glow=x.createLinearGradient(10,11,46,23);glow.addColorStop(0,'rgba(255,255,255,.32)');glow.addColorStop(.4,'rgba(255,255,255,.04)');glow.addColorStop(1,'rgba(0,0,0,.28)');x.fillStyle=glow;x.fillRect(10,11,36,12);
+  x.strokeStyle='#c5a45f';x.lineWidth=1;x.strokeRect(8,9,40,16);
+  x.fillStyle='#fff4d1';x.font='bold 7px Arial';x.textAlign='center';x.shadowColor=col;x.shadowBlur=4;x.fillText(t1.toUpperCase(),28,20);x.shadowBlur=0;
+  x.fillStyle='#111416';x.fillRect(10,27,36,27);x.strokeStyle='#55595a';x.strokeRect(10.5,27.5,35,26);
+  x.fillStyle='#07090a';x.fillRect(13,30,30,20);x.fillStyle=col;x.globalAlpha=.22;x.fillRect(14,31,28,18);x.globalAlpha=1;
+  // recognizable bottles and a glowing pressure coil behind the glass
+  x.strokeStyle=col;x.globalAlpha=.75;x.lineWidth=1.5;x.beginPath();x.moveTo(28,32);x.lineTo(24,36);x.lineTo(31,40);x.lineTo(24,44);x.lineTo(31,48);x.stroke();x.globalAlpha=1;
+  for(let i=0;i<3;i++){const bx=17+i*11;x.fillStyle='#17191b';x.fillRect(bx,35,6,12);x.fillStyle=col;x.fillRect(bx+1,38,4,5);x.fillStyle='#ddd';x.fillRect(bx+2,33,2,2);}
+  x.fillStyle='#111';x.fillRect(12,57,32,8);x.fillStyle='#24282a';x.fillRect(14,58,28,5);x.fillStyle=col;x.globalAlpha=.85;x.fillRect(17,59,22,2);x.globalAlpha=1;
+  x.fillStyle='#c5a45f';for(const bx of[7,47]){x.fillRect(bx,29,2,23);x.fillRect(bx,56,2,10);}
+  x.fillStyle='#090a0b';x.fillRect(7,68,42,5);x.fillStyle='#666';x.fillRect(11,70,34,1);return c;}
+function mkForge(){const c=mkCanvas(72,76),x=c.getContext('2d');
+  // Pack-a-Punch: reinforced steel housing, hazard trim, weapon chamber and energized coils.
+  x.fillStyle='rgba(0,0,0,.5)';x.fillRect(5,9,62,64);x.fillStyle='#101316';x.fillRect(3,6,64,66);
+  x.fillStyle='#34383b';x.fillRect(6,9,58,56);x.fillStyle='#55595a';x.fillRect(8,11,54,5);
+  x.fillStyle='#17191b';x.fillRect(10,1,50,13);x.strokeStyle='#c9a34b';x.lineWidth=2;x.strokeRect(10,1,50,13);
+  x.fillStyle='#f1d38b';x.font='bold 7px Arial';x.textAlign='center';x.fillText('PACK-A-PUNCH',35,10);
+  x.fillStyle='#0a0c0d';x.fillRect(12,19,46,34);x.strokeStyle='#8c7445';x.lineWidth=2;x.strokeRect(12,19,46,34);
+  const energy=x.createRadialGradient(35,36,2,35,36,25);energy.addColorStop(0,'#fff3c2');energy.addColorStop(.2,'#ffb8ed');energy.addColorStop(.52,'#d72cff');energy.addColorStop(1,'#48147c');
+  x.fillStyle=energy;x.fillRect(14,21,42,30);
+  // weapon silhouette sits inside the transformation chamber
+  x.fillStyle='#111319';x.fillRect(19,34,31,5);x.fillRect(39,31,12,2);x.fillRect(24,38,5,8);x.fillRect(18,31,9,3);
+  x.strokeStyle='#fff0c8';x.lineWidth=1;x.beginPath();x.moveTo(15,24);x.lineTo(55,48);x.moveTo(55,24);x.lineTo(15,48);x.stroke();
+  x.fillStyle='#d9b95e';for(const bx of[9,60]){x.fillRect(bx,20,3,33);for(let by=24;by<51;by+=7)x.fillRect(bx,by,3,2);}
+  x.fillStyle='#0a0b0c';x.fillRect(12,57,46,8);x.fillStyle='#f2b9ec';x.fillRect(17,59,36,2);
+  x.fillStyle='#c9a34b';x.fillRect(5,67,60,3);x.fillStyle='#090a0b';x.fillRect(3,71,64,3);return c;}
 function mkGargoyle(){const c=mkCanvas(20,24),x=c.getContext('2d');
   x.fillStyle='#3d4652';x.fillRect(4,4,12,10);x.fillRect(2,6,4,6);x.fillRect(14,6,4,6);
   x.fillStyle='#5a6all';x.fillStyle='#5a6470';x.fillRect(7,2,6,4);x.fillStyle='#e33';x.fillRect(7,6,2,2);x.fillRect(11,6,2,2);
@@ -757,15 +780,16 @@ function damageZombie(z,dmg,dx,dy,head){
   if(z.dead)return false;
   if(z.win&&z.win.busyZ>0&&z.st==='break')return false;
   z.hp-=dmg;z.hurt=0.16;game.hits++;
-  let pts=10+(head?25:0);
+  const hitPts=50;
+  givePoints(hitPts);pop('+'+hitPts);updateHUD();
   if(dx||dy){z.x+=dx*0.05;z.y+=dy*0.05;}
   hitmark();rumble(50,0.5,0.1);
   for(let i=0;i<(head?5:3);i++)parts.push({x:z.x,y:z.y,z:head?rnd(.7,.95):rnd(.25,.7),vx:(dx||rnd(-.5,.5))*rnd(.5,2),vy:(dy||rnd(-.5,.5))*rnd(.5,2),life:rnd(.15,.4),c:'#7d1414',s:2});
   if(z.hp<=0){
     z.dead=true;z.dt=0;game.kills++;
-    const p=Math.round(ZT[z.t].pts*(z.boss?1.4:1));
+    const p=500;
     givePoints(p);pop('+'+p);
-    if(head){game.heads++;const b=40;givePoints(b);}
+    if(head)game.heads++;
     sfx('groan',{pan:clamp(Math.sin(Math.atan2(z.y-player.y,z.x-player.x)-player.a),-1,1)});
     for(let i=0;i<12;i++)parts.push({x:z.x,y:z.y,z:rnd(.2,.9),vx:rnd(-2.5,2.5),vy:rnd(-2.5,2.5),life:rnd(.2,.6),c:'#5a1010',s:3});
     if(ZT[z.t].expl)explode(z.x,z.y,2.2,Math.round(ZT[z.t].expl*(1+game.round*0.1)),z);
@@ -1123,7 +1147,7 @@ function forgeUp(){
   if(game.points<cost){deny();return;}
   givePoints(-cost);player.weapUp[s.w]=lvl+1;
   curW().mag=wMagFull(s.w)+0;curW().mag=Math.min(wMag(),999);
-  sfx('egg');toast('WAR FORGE '+WEAPONS[s.w].n.toUpperCase()+' '+UPG_N[lvl+1]+' — FORGED');readerPop(-cost);updateHUD();
+  sfx('egg');toast('PACK-A-PUNCH '+WEAPONS[s.w].n.toUpperCase()+' '+UPG_N[lvl+1]+' — UPGRADED');readerPop(-cost);updateHUD();
 }
 function radioAct(){
   if(radioAct._cd>0){return;}radioAct._cd=6;
@@ -1145,7 +1169,7 @@ function showPrompt(t){
     e.innerHTML=kkh+' '+PERKS[p.id].n+' <span class="pc">'+PERKS[p.id].px+'</span>';}
   else if(t.k==='door')e.innerHTML=kkh+' '+t.o.name+' <span class="pc">'+t.o.px+'</span>';
   else if(t.k==='forge'){const lvl=player.weapUp[curW().w]||0;
-    e.innerHTML=lvl>=4?'<b>WAR FORGE</b> MAX LEVEL':'<b>WAR FORGE</b> UPGRADE '+WEAPONS[curW().w].n.toUpperCase()+' (<span class="pc">'+Math.round(2000*(lvl+1)*Math.pow(1.6,lvl))+'</span>) → '+UPG_N[Math.min(lvl+1,4)];}
+    e.innerHTML=lvl>=4?'<b>PACK-A-PUNCH</b> MAX LEVEL':'<b>PACK-A-PUNCH</b> UPGRADE '+WEAPONS[curW().w].n.toUpperCase()+' (<span class="pc">'+Math.round(2000*(lvl+1)*Math.pow(1.6,lvl))+'</span>) → '+UPG_N[Math.min(lvl+1,4)];}
   else if(t.k==='box')e.innerHTML=boxRoll.on?'ROLLING...':(kkh+' MYSTERY BOX <span class="pc">✥950</span>');
   else if(t.k==='repair')e.innerHTML=kkh+' REPAIR BARRICADE <span class="pc">+10</span>';
   else if(t.k==='radio')e.innerHTML=kk+' LISTEN TO RADIO';
@@ -1271,7 +1295,7 @@ function updateHUD(force){
   const pk=player.perks.map(id=>PERKS[id].n.split(' ')[1]).join(' · ');
   if(force||hudCache.pk!==pk){hudCache.pk=pk;$('perkIcons').innerHTML=player.perks.map(id=>'<span style="color:'+PERKS[id].c+'">'+PERKS[id].n+'</span>').join(' ');}
   if(nemesis&&!nemesis.dead){$('bossBar').style.width=clamp(nemesis.hp/nemesis.mhp*100,0,100)+'%';}
-  $('upgl').innerHTML=player.weapUp[s.w]?'<span style="color:#e8b23a;font-size:10px;letter-spacing:2px">WAR FORGE '+UPG_N[player.weapUp[s.w]]+'</span>':'<span style="color:#555;font-size:9px;letter-spacing:1px">UNFORGED</span>';
+  $('upgl').innerHTML=player.weapUp[s.w]?'<span style="color:#e8b23a;font-size:10px;letter-spacing:2px">PACK-A-PUNCH '+UPG_N[player.weapUp[s.w]]+'</span>':'<span style="color:#555;font-size:9px;letter-spacing:1px">UNFORGED</span>';
 }
 /* ---------------- FLOW ---------------- */
 function requestGamePointerLock(){
@@ -1650,6 +1674,19 @@ function postFX(){
     for(const b of weatherBits){b.y+=0.004*b.s;b.x+=Math.sin(nw*2+b.s*9)*0.0016;if(b.y>1){b.y-=1;b.x=Math.random();}
       ctx.fillRect(b.x*RW,b.y*RH,b.s*2.2,b.s*2.2);}
   }
+  // Lightweight cinematic grade: restrained center bloom and fine scanlines keep
+  // the raycaster crisp while adding a modern, high-contrast presentation.
+  ctx.save();
+  ctx.globalCompositeOperation='screen';
+  const bloom=ctx.createRadialGradient(RW*0.5,RH*0.48,0,RW*0.5,RH*0.48,RW*0.62);
+  bloom.addColorStop(0,'rgba(255,221,174,0.045)');
+  bloom.addColorStop(0.55,'rgba(116,157,184,0.018)');
+  bloom.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=bloom;ctx.fillRect(0,0,RW,RH);
+  ctx.globalCompositeOperation='source-over';
+  ctx.fillStyle='rgba(5,8,12,0.035)';
+  for(let y=1;y<RH;y+=4)ctx.fillRect(0,y,RW,1);
+  ctx.restore();
   // low hp red pulse
   const hpF=player.hp/player.max;
   if(hpF<0.45&&game.state==='play'){
